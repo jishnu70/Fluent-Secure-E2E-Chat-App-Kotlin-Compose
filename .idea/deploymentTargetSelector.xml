@@ -8,6 +8,9 @@
       <SelectionState runConfigName="ChatListScreenRoot">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="MessageScreenRoot">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>
