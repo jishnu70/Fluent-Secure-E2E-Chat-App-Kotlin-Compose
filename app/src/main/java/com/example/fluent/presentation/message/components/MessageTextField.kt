@@ -2,19 +2,29 @@ package com.example.fluent.presentation.message.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,30 +37,51 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.fluent.R
 import com.example.fluent.presentation.common.CustomIconButton
 import com.example.fluent.ui.theme.Brown
 import com.example.fluent.ui.theme.Peach
 import com.example.fluent.ui.theme.PeachWhite
+import kotlinx.coroutines.delay
 
 @Composable
 fun MessageTextField(modifier: Modifier) {
     var textFieldSelected by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
+    var showInsideButtons by remember { mutableStateOf(false) }
+    var showOutsideButtons by remember { mutableStateOf(true) }
+
+    val message = remember { mutableStateOf("") }
+
+    LaunchedEffect(textFieldSelected) {
+        if (textFieldSelected == true) {
+            showOutsideButtons = false
+            delay(300)
+            showInsideButtons = true
+        } else {
+            showInsideButtons = false
+            delay(300)
+            showOutsideButtons = true
+        }
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(IntrinsicSize.Min)
             .padding(end = 8.dp)
             .clip(RoundedCornerShape(30))
-            .background(Peach.copy(alpha = 0.4f),RoundedCornerShape(30)),
+            .background(Peach.copy(alpha = 0.4f), RoundedCornerShape(30)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .weight(3f)
-                .padding(start = 8.dp, top = 8.dp, bottom = 8.dp),
+                .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
+                .align(Alignment.CenterVertically),
             shape = RoundedCornerShape(30),
             color = PeachWhite,
             shadowElevation = 6.dp,
@@ -62,19 +93,21 @@ fun MessageTextField(modifier: Modifier) {
                     .padding(horizontal = 4.dp)
                     .background(PeachWhite)
                     .animateContentSize(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = message.value,
+                    onValueChange = { message.value = it },
                     modifier = Modifier
                         .weight(3f)
-                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .padding(horizontal = 8.dp)
                         .onFocusChanged { focusSate ->
                             textFieldSelected = focusSate.isFocused
                         }
-                        .focusRequester(focusRequester),
+                        .focusRequester(focusRequester)
+                        .align(Alignment.CenterVertically),
                     colors = TextFieldDefaults.colors(
                         unfocusedContainerColor = PeachWhite,
                         focusedContainerColor = PeachWhite,
@@ -83,10 +116,13 @@ fun MessageTextField(modifier: Modifier) {
                         focusedIndicatorColor = Color.Transparent,
                         errorIndicatorColor = Color.Transparent
                     ),
-                    placeholder = { Text(text = "Message") }
+                    placeholder = { Text(text = "Message") },
+                    textStyle = LocalTextStyle.current.copy(fontSize = 16.sp)
                 )
                 AnimatedVisibility(
-                    visible = textFieldSelected,
+                    visible = showInsideButtons,
+                    enter = fadeIn(tween(250)) + expandHorizontally(tween(100)),
+                    exit = fadeOut(tween(250)) + shrinkHorizontally(tween(100)),
                     modifier = Modifier
                         .weight(1f)
                         .align(Alignment.CenterVertically)
@@ -111,7 +147,9 @@ fun MessageTextField(modifier: Modifier) {
         }
         Spacer(modifier = Modifier.width(20.dp))
         AnimatedVisibility(
-            visible = !textFieldSelected,
+            visible = showOutsideButtons,
+            enter = fadeIn(tween(250)) + expandHorizontally(tween(100)),
+            exit = fadeOut(tween(250)) + shrinkHorizontally(tween(100)),
             modifier = Modifier.weight(1f)
         ) {
             Row(modifier = Modifier.fillMaxWidth()) {
