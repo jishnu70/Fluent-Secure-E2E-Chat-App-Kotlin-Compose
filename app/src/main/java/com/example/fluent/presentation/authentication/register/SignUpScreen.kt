@@ -40,9 +40,11 @@ import com.example.fluent.R
 import com.example.fluent.presentation.authentication.AuthAction
 import com.example.fluent.presentation.authentication.AuthState
 import com.example.fluent.presentation.authentication.AuthViewModel
-import com.example.mangakart.presentation.authentication.login.components.CustomDefaultBtn
-import com.example.mangakart.presentation.authentication.login.components.CustomTextField
-import com.example.mangakart.presentation.authentication.register.components.DefaultBackArrow
+import com.example.fluent.presentation.authentication.login.components.CustomDefaultBtn
+import com.example.fluent.presentation.authentication.login.components.CustomTextField
+import com.example.fluent.presentation.authentication.register.components.DefaultBackArrow
+import com.example.fluent.ui.theme.Peach
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SignUpScreenRoot(
@@ -190,7 +192,7 @@ fun SignUpScreen(
                             modifier = Modifier
                                 .size(50.dp)
                                 .background(
-                                    SandYellow,
+                                    Peach,
                                     shape = CircleShape
                                 ),
                             contentAlignment = Alignment.Center
@@ -204,7 +206,7 @@ fun SignUpScreen(
                             modifier = Modifier
                                 .size(50.dp)
                                 .background(
-                                    SandYellow,
+                                    Peach,
                                     shape = CircleShape
                                 )
                                 .clickable {},
@@ -219,7 +221,7 @@ fun SignUpScreen(
                             modifier = Modifier
                                 .size(50.dp)
                                 .background(
-                                    SandYellow,
+                                    Peach,
                                     shape = CircleShape
                                 )
                                 .clickable {},
@@ -315,7 +317,7 @@ fun SignUpScreen(
                         )
                         Text(
                             text = "Terms & Condition",
-                            color = SandYellow,
+                            color = Peach,
                             modifier = Modifier.clickable {}
                         )
                     }

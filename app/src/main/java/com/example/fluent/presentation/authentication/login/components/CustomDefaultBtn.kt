@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.fluent.ui.theme.Peach
 
 @Composable
 fun CustomDefaultBtn(
@@ -30,7 +31,7 @@ fun CustomDefaultBtn(
             onClick()
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = SandYellow,
+            containerColor = Peach,
             contentColor = Color.Black
 //            backgroundColor = SandYellow,
 //            contentColor = Color.White

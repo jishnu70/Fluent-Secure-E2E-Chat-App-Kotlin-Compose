@@ -45,6 +45,8 @@ import com.example.fluent.presentation.authentication.AuthViewModel
 import com.example.fluent.presentation.authentication.login.components.CustomDefaultBtn
 import com.example.fluent.presentation.authentication.login.components.CustomTextField
 import com.example.fluent.presentation.authentication.register.components.DefaultBackArrow
+import com.example.fluent.ui.theme.Peach
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreenRoot(
@@ -169,7 +171,7 @@ fun LoginScreen(
                                 checked = checkBox, onCheckedChange = {
                                     checkBox = it
                                 },
-                                colors = CheckboxDefaults.colors(checkedColor = SandYellow)
+                                colors = CheckboxDefaults.colors(checkedColor = Peach)
                             )
                             Text(text = "Remember me", color = Color.Black, fontSize = 14.sp)
                         }
@@ -202,7 +204,7 @@ fun LoginScreen(
                                 modifier = Modifier
                                     .size(50.dp)
                                     .background(
-                                        SandYellow,
+                                        Peach,
                                         shape = CircleShape
                                     ),
                                 contentAlignment = Alignment.Center
@@ -216,7 +218,7 @@ fun LoginScreen(
                                 modifier = Modifier
                                     .size(50.dp)
                                     .background(
-                                        SandYellow,
+                                        Peach,
                                         shape = CircleShape
                                     )
                                     .clickable {
@@ -233,7 +235,7 @@ fun LoginScreen(
                                 modifier = Modifier
                                     .size(50.dp)
                                     .background(
-                                        SandYellow,
+                                        Peach,
                                         shape = CircleShape
                                     )
                                     .clickable {

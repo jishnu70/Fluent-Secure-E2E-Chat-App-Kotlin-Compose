@@ -2,9 +2,9 @@ package com.example.fluent.presentation.authentication
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mangakart.domain.models.AuthUser
-import com.example.mangakart.domain.repository.AuthRepository
-import com.example.mangakart.domain.utility.Email
+import com.example.fluent.domain.models.AuthUser
+import com.example.fluent.domain.repository.AuthRepository
+import com.example.fluent.domain.utility.Email
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
