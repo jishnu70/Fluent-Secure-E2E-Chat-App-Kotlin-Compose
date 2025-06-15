@@ -1,6 +1,6 @@
 package com.example.fluent.data.network
 
-const val BASE_URL = "https://mangakart.onrender.com"
+const val BASE_URL = "https://cryptalkfastapi.onrender.com/"
 
 object AuthRoutes {
     const val REGISTER = "$BASE_URL/auth/register"
@@ -8,12 +8,12 @@ object AuthRoutes {
     const val REFRESH_TOKEN = "$BASE_URL/auth/refresh"
 }
 
-object CartRoutes {
-    const val GET_CART = "$BASE_URL/cart"
-    const val ADD_TO_CART = "$BASE_URL/cart/add/"
+object MessageRoutes {
+    const val PARTNER_INFO = "$BASE_URL/chat/partnerinfo"
+    const val CHAT_LIST = "$BASE_URL/chat/chat_list"
+    const val GET_ALL_MESSAGES = "$BASE_URL/chat/all_messages"
 }
 
-object OrderRoutes {
-    const val GET_ORDER = "$BASE_URL/order"
-    const val ADD_TO_ORDER = "$BASE_URL/order/add/"
+object WebSocketRoutes {
+    const val CHAT = "wss://cryptalkfastapi.onrender.com/ws/chat"
 }

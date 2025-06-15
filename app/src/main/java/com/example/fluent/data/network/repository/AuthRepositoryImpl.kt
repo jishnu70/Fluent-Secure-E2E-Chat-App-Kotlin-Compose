@@ -55,7 +55,7 @@ class AuthRepositoryImpl(
     override suspend fun loginUser(user: AuthUser): Result<TokenResponse> {
         return try {
             val result = httpClient.post(AuthRoutes.LOGIN) {
-                setBody(user)
+                setBody(user.toDtoUser())
             }
             Log.d("Login Request sent", "Result: $result")
             if (result.status.isSuccess()) {

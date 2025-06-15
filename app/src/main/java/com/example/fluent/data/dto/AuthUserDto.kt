@@ -7,5 +7,6 @@ import kotlinx.serialization.Serializable
 data class AuthUserDto(
     @SerialName("username") val username: String,
     @SerialName("email") val email: String? = null,
-    @SerialName("password") val password: String
+    @SerialName("password") val password: String,
+    @SerialName("public_key") val publicKey: String? = null
 )

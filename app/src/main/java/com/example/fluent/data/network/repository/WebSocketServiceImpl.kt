@@ -8,7 +8,7 @@ import com.example.fluent.data.mapper.toDomainMessage
 import com.example.fluent.domain.models.Message
 import com.example.fluent.domain.models.MessageCreate
 import com.example.fluent.domain.repository.WebSocketService
-import com.example.fluent.domain.utility.EncryptionHelper
+import com.example.fluent.data.remote.EncryptionHelper
 import com.example.fluent.domain.utility.KeyManager
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocketSession
@@ -92,7 +92,7 @@ class WebSocketServiceImpl(
                 val messageJson = Json.encodeToString(MessageCreateDto.serializer(), messageDto)
                 session?.send(Frame.Text(messageJson))
             } catch (e: Exception) {
-                println("Error sending message: ${e.message}")
+                Log.d("WebSocketServiceImpl", "Error sending message: ${e.message}")
             }
         }
     }

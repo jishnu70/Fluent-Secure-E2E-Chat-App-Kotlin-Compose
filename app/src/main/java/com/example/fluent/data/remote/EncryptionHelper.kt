@@ -1,4 +1,4 @@
-package com.example.fluent.domain.utility
+package com.example.fluent.data.remote
 
 import android.util.Base64
 import java.security.PrivateKey
