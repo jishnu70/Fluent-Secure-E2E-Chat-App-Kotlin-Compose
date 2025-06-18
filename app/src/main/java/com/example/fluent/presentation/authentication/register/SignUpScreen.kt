@@ -16,9 +16,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,6 +53,7 @@ fun SignUpScreenRoot(
     viewModel: AuthViewModel = koinViewModel(),
     onLoginButtonClicked: () -> Unit,
     onBackClick: () -> Unit,
+    onRegisterSuccess: () -> Unit
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
 
@@ -68,258 +71,291 @@ fun SignUpScreenRoot(
             viewModel.onAction(action = action)
         },
         onBackClick = onBackClick,
+        onRegisterSuccess = onRegisterSuccess
     )
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SignUpScreen(
+private fun SignUpScreen(
     state: AuthState,
     onAction: (AuthAction) -> Unit,
     onBackClick: () -> Unit,
+    onRegisterSuccess: () -> Unit
 ) {
     val errorState = remember { mutableStateOf(state.error != null) }
     val animate = remember { mutableStateOf(true) }
 
-    AnimatedContent(
-        targetState = animate.value,
-        transitionSpec = {
-            slideInHorizontally(
-                initialOffsetX = { value ->
-                    value
-                }
-            ).togetherWith(
-                slideOutHorizontally(
-                    targetOffsetX = { value ->
-                        -value
-                    }
-                )
-            )
-        }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+            .navigationBarsPadding(),
+        contentAlignment = Alignment.Center
     ) {
-        if (it) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(30.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                )
-                {
-                    Box(modifier = Modifier.weight(0.7f)) {
-                        DefaultBackArrow {
-                            onBackClick()
-                        }
-                    }
-                    Box(modifier = Modifier.weight(1.0f)) {
-                        Text(
-                            text = "Sign Up",
-                            color = Color.Black,
-                            fontSize = 18.sp
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(50.dp))
-                Text(text = "Register Account", fontSize = 26.sp, fontWeight = FontWeight.Bold)
-                Text(
-                    text = "Complete your details or continue\nwith social media.",
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(50.dp))
-                CustomTextField(
-                    placeholder = "example@email.com",
-                    trailingIcon = R.drawable.mail,
-                    label = "Email",
-                    errorState = errorState,
-                    keyboardType = KeyboardType.Email,
-                    visualTransformation = VisualTransformation.None,
-                    onChanged = { newEmail ->
-                        onAction(AuthAction.OnEmailChange(newEmail.text))
-                    }
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                CustomTextField(
-                    placeholder = "********",
-                    trailingIcon = R.drawable.lock,
-                    label = "Password",
-                    keyboardType = KeyboardType.Password,
-                    errorState = errorState,
-                    visualTransformation = PasswordVisualTransformation(),
-                    onChanged = { newPass ->
-                        onAction(AuthAction.OnPasswordChange(newPass.text))
-                    }
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                CustomTextField(
-                    placeholder = "********",
-                    trailingIcon = R.drawable.lock,
-                    label = "Confirm Password",
-                    keyboardType = KeyboardType.Password,
-                    errorState = errorState,
-                    visualTransformation = PasswordVisualTransformation(),
-                    onChanged = { newPass ->
-                        onAction(AuthAction.OnConfirmPasswordChange(newPass.text))
-                    }
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                if (errorState.value) {
-                    Text(text = state.error ?: "password do not match", color = Color.Red)
-                }
-                CustomDefaultBtn(shapeSize = 50f, btnText = "Continue") {
-                    //email pattern
-                    onAction(AuthAction.OnSubmit)
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(bottom = 50.dp),
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            space = 10.dp,
-                            alignment = Alignment.CenterHorizontally
-                        )
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .background(
-                                    Peach,
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.google_icon),
-                                contentDescription = "Google Login Icon"
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .background(
-                                    Peach,
-                                    shape = CircleShape
-                                )
-                                .clickable {},
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.twitter),
-                                contentDescription = "Twitter Login Icon"
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .background(
-                                    Peach,
-                                    shape = CircleShape
-                                )
-                                .clickable {},
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.facebook_2),
-                                contentDescription = "Facebook Login Icon"
-                            )
-                        }
-                    }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 30.dp)
-                            .clickable {},
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "By continuing you confirm that you agree",
-                            color = Color.Black
-                        )
-                        Row()
-                        {
-                            Text(
-                                text = "with our ",
-                                color = Color.Black,
-                            )
-                            Text(
-                                text = "Terms & Condition",
-                                color = Color.Black,
-                                modifier = Modifier.clickable {}
-                            )
-                        }
-                    }
-                }
+        when {
+            state.isLoading -> {
+                CircularProgressIndicator()
             }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(30.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                )
-                {
-                    Box(modifier = Modifier.weight(0.7f)) {
-                        DefaultBackArrow {
-                            animate.value = !animate.value
-                        }
-                    }
-                    Box(modifier = Modifier.weight(1.0f)) {
-                        Text(
-                            text = "Sign Up",
-                            color = Color.Black,
-                            fontSize = 18.sp
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(50.dp))
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 50.dp),
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 30.dp)
-                        .clickable {
 
-                        },
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+            state.isAuthenticated -> {
+                onRegisterSuccess()
+            }
+
+            state.error != null -> {
+                errorState.value = true
+            }
+
+            else -> {
+                AnimatedContent(
+                    targetState = animate.value,
+                    transitionSpec = {
+                        slideInHorizontally(
+                            initialOffsetX = { value ->
+                                value
+                            }
+                        ).togetherWith(
+                            slideOutHorizontally(
+                                targetOffsetX = { value ->
+                                    -value
+                                }
+                            )
+                        )
+                    }
                 ) {
-                    Text(
-                        text = "By continuing you confirm that you agree",
-                        color = Color.Black
-                    )
-                    Row()
-                    {
-                        Text(
-                            text = "with our ",
-                            color = Color.Black,
-                        )
-                        Text(
-                            text = "Terms & Condition",
-                            color = Peach,
-                            modifier = Modifier.clickable {}
-                        )
+                    if (it) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(30.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            )
+                            {
+                                Box(modifier = Modifier.weight(0.7f)) {
+                                    DefaultBackArrow {
+                                        onBackClick()
+                                    }
+                                }
+                                Box(modifier = Modifier.weight(1.0f)) {
+                                    Text(
+                                        text = "Sign Up",
+                                        color = Color.Black,
+                                        fontSize = 18.sp
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(50.dp))
+                            Text(
+                                text = "Register Account",
+                                fontSize = 26.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Complete your details or continue\nwith social media.",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(50.dp))
+                            CustomTextField(
+                                placeholder = "example@email.com",
+                                trailingIcon = R.drawable.mail,
+                                label = "Email",
+                                errorState = errorState,
+                                keyboardType = KeyboardType.Email,
+                                visualTransformation = VisualTransformation.None,
+                                onChanged = { newEmail ->
+                                    onAction(AuthAction.OnEmailChange(newEmail.text))
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(20.dp))
+                            CustomTextField(
+                                placeholder = "********",
+                                trailingIcon = R.drawable.lock,
+                                label = "Password",
+                                keyboardType = KeyboardType.Password,
+                                errorState = errorState,
+                                visualTransformation = PasswordVisualTransformation(),
+                                onChanged = { newPass ->
+                                    onAction(AuthAction.OnPasswordChange(newPass.text))
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(20.dp))
+                            CustomTextField(
+                                placeholder = "********",
+                                trailingIcon = R.drawable.lock,
+                                label = "Confirm Password",
+                                keyboardType = KeyboardType.Password,
+                                errorState = errorState,
+                                visualTransformation = PasswordVisualTransformation(),
+                                onChanged = { newPass ->
+                                    onAction(AuthAction.OnConfirmPasswordChange(newPass.text))
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            if (errorState.value) {
+                                Text(
+                                    text = state.error ?: "password do not match",
+                                    color = Color.Red
+                                )
+                            }
+                            CustomDefaultBtn(shapeSize = 50f, btnText = "Continue") {
+                                //email pattern
+                                onAction(AuthAction.OnSubmit)
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(bottom = 50.dp),
+                                verticalArrangement = Arrangement.Bottom
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        space = 10.dp,
+                                        alignment = Alignment.CenterHorizontally
+                                    )
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(50.dp)
+                                            .background(
+                                                Peach,
+                                                shape = CircleShape
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.google_icon),
+                                            contentDescription = "Google Login Icon"
+                                        )
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .size(50.dp)
+                                            .background(
+                                                Peach,
+                                                shape = CircleShape
+                                            )
+                                            .clickable {},
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.twitter),
+                                            contentDescription = "Twitter Login Icon"
+                                        )
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .size(50.dp)
+                                            .background(
+                                                Peach,
+                                                shape = CircleShape
+                                            )
+                                            .clickable {},
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.facebook_2),
+                                            contentDescription = "Facebook Login Icon"
+                                        )
+                                    }
+                                }
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 30.dp)
+                                        .clickable {},
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = "By continuing you confirm that you agree",
+                                        color = Color.Black
+                                    )
+                                    Row()
+                                    {
+                                        Text(
+                                            text = "with our ",
+                                            color = Color.Black,
+                                        )
+                                        Text(
+                                            text = "Terms & Condition",
+                                            color = Color.Black,
+                                            modifier = Modifier.clickable {}
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(30.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            )
+                            {
+                                Box(modifier = Modifier.weight(0.7f)) {
+                                    DefaultBackArrow {
+                                        animate.value = !animate.value
+                                    }
+                                }
+                                Box(modifier = Modifier.weight(1.0f)) {
+                                    Text(
+                                        text = "Sign Up",
+                                        color = Color.Black,
+                                        fontSize = 18.sp
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(50.dp))
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(bottom = 50.dp),
+                            verticalArrangement = Arrangement.Bottom
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 30.dp)
+                                    .clickable {
+
+                                    },
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "By continuing you confirm that you agree",
+                                    color = Color.Black
+                                )
+                                Row()
+                                {
+                                    Text(
+                                        text = "with our ",
+                                        color = Color.Black,
+                                    )
+                                    Text(
+                                        text = "Terms & Condition",
+                                        color = Peach,
+                                        modifier = Modifier.clickable {}
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

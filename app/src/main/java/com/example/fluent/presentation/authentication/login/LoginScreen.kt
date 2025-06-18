@@ -72,7 +72,7 @@ fun LoginScreenRoot(
 }
 
 @Composable
-fun LoginScreen(
+private fun LoginScreen(
     state: AuthState,
     onAction: (AuthAction) -> Unit,
     onBackClick: () -> Unit,

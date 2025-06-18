@@ -5,13 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.fluent.domain.models.AuthUser
 import com.example.fluent.domain.repository.AuthRepository
 import com.example.fluent.domain.utility.Email
+import com.example.fluent.domain.utility.KeyManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val keyManager: KeyManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(AuthState())
     val state = _state.asStateFlow()
@@ -60,12 +62,14 @@ class AuthViewModel(
                     )
                     runCatching {
                         if (_state.value.registerNewUser) {
+                            val getPublicKey = keyManager.getPublicKey()
+                            val userWithPublicKey = user.copy(publicKey = getPublicKey)
                             if (_state.value.password.contentEquals( _state.value.confirmPassword)){
                                 validateEmailOrNull(_state.value.email)?.let { error ->
                                     _state.update { it.copy(error = error) }
                                     return@launch
                                 }
-                                authRepository.registerNewUser(user)
+                                authRepository.registerNewUser(userWithPublicKey)
                             } else {
                                 _state.update {
                                     it.copy(error = "Passwords do not match")

@@ -1,7 +1,5 @@
 package com.example.fluent.presentation.chatList.components
 
-//import androidx.compose.runtime.Composable
-//import coil3.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,20 +29,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.fluent.R
+import com.example.fluent.domain.models.ChatList
 import com.example.fluent.ui.theme.Brown
 import com.example.fluent.ui.theme.Peach
 import com.example.fluent.ui.theme.PeachWhite
 
-@Preview(showBackground = true)
 @Composable
-fun ChatListItem() {
+fun ChatListItem(
+    chat: ChatList,
+    onChatClick: (ChatList) -> Unit
+) {
     Surface(
         shape = RoundedCornerShape(10),
         modifier = Modifier
-            .clickable(onClick = {}),
+            .clickable(onClick = { onChatClick(chat) }),
         color = PeachWhite.copy(alpha = 0.3f)
     ) {
         Row(
@@ -96,7 +96,7 @@ fun ChatListItem() {
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
-                        text = "User1",
+                        text = chat.partner.user_name,
                         style = MaterialTheme.typography.titleLarge,
                         color = Brown,
                         textAlign = TextAlign.Center,
@@ -116,7 +116,7 @@ fun ChatListItem() {
                 }
                 Spacer(modifier = Modifier.padding(4.dp))
                 Text(
-                    text = "this is a new message",
+                    text = chat.message.content,
                     style = MaterialTheme.typography.labelLarge,
                     color = Brown.copy(alpha = 0.7f),
                     textAlign = TextAlign.Center,

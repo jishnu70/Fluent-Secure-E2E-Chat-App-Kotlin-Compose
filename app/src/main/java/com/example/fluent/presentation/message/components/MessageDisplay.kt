@@ -12,14 +12,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.fluent.presentation.message.MessageDummy
+import com.example.fluent.domain.models.Message
 import com.example.fluent.ui.theme.Peach
 
 @Composable
 fun MessageDisplay(
-    message: MessageDummy
+    message: Message
 ) {
     Column(
         modifier = Modifier
@@ -41,7 +40,7 @@ fun MessageDisplay(
                 .background(if (message.isFromUser)Peach else Peach.copy(alpha = 0.4f))
                 .padding(16.dp)
         ) {
-            Text(text = "Hello from ${message.message}")
+            Text(text = "Hello from ${message.content}")
         }
     }
 }

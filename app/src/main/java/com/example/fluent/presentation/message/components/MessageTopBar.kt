@@ -32,9 +32,11 @@ import com.example.fluent.ui.theme.MatteWhiteGrayMedium
 import com.example.fluent.ui.theme.Peach
 import com.example.fluent.ui.theme.PeachWhite
 
-@Preview(showBackground = true)
 @Composable
-fun MessageTopBar(modifier: Modifier = Modifier) {
+fun MessageTopBar(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit,
+) {
     Surface(
         modifier = Modifier
             .fillMaxWidth(),
@@ -66,7 +68,7 @@ fun MessageTopBar(modifier: Modifier = Modifier) {
                 contentAlignment = Alignment.CenterStart
             ) {
                 IconButton(
-                    onClick = {},
+                    onClick = { onBackClick() },
                     modifier = Modifier.padding(8.dp)
                 ) {
                     Icon(

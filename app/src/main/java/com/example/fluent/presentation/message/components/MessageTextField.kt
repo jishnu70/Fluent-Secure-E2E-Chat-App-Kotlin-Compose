@@ -40,19 +40,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fluent.R
 import com.example.fluent.presentation.common.CustomIconButton
+import com.example.fluent.presentation.message.MessageAction
+import com.example.fluent.presentation.message.MessageState
 import com.example.fluent.ui.theme.Brown
 import com.example.fluent.ui.theme.Peach
 import com.example.fluent.ui.theme.PeachWhite
 import kotlinx.coroutines.delay
 
 @Composable
-fun MessageTextField(modifier: Modifier) {
+fun MessageTextField(
+    modifier: Modifier,
+    state: MessageState,
+    onAction: (MessageAction) -> Unit,
+) {
     var textFieldSelected by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     var showInsideButtons by remember { mutableStateOf(false) }
     var showOutsideButtons by remember { mutableStateOf(true) }
-
-    val message = remember { mutableStateOf("") }
 
     LaunchedEffect(textFieldSelected) {
         if (textFieldSelected == true) {
@@ -97,8 +101,8 @@ fun MessageTextField(modifier: Modifier) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextField(
-                    value = message.value,
-                    onValueChange = { message.value = it },
+                    value = state.messageString,
+                    onValueChange = { onAction(MessageAction.OnMessageChange(it)) },
                     modifier = Modifier
                         .weight(3f)
                         .fillMaxSize()
@@ -129,17 +133,10 @@ fun MessageTextField(modifier: Modifier) {
                 ) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         CustomIconButton(
-                            onClick = {},
-                            icon = R.drawable.microphone,
+                            onClick = { onAction(MessageAction.OnSendMessage(state.messageString)) },
+                            icon = R.drawable.arrow,
                             contentDescription = "Microphone",
                             tint = Peach,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        CustomIconButton(
-                            onClick = {},
-                            icon = R.drawable.image_upload,
-                            contentDescription = "Image Upload",
-                            tint = Peach
                         )
                     }
                 }
