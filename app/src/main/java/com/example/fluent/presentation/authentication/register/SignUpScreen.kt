@@ -65,7 +65,7 @@ fun SignUpScreenRoot(
         state = state,
         onAction = { action ->
             when (action) {
-                is AuthAction.OnToggleRegisterLoginMode -> onLoginButtonClicked
+                is AuthAction.OnToggleRegisterLoginMode -> onLoginButtonClicked()
                 else -> Unit
             }
             viewModel.onAction(action = action)
@@ -288,6 +288,16 @@ private fun SignUpScreen(
                                             text = "Terms & Condition",
                                             color = Color.Black,
                                             modifier = Modifier.clickable {}
+                                        )
+                                    }
+                                    Row {
+                                        Text(text = "Already have an account? ", color = Color.Black)
+                                        Text(
+                                            text = "Sign In",
+                                            color = Color.Black,
+                                            modifier = Modifier.clickable {
+                                                onAction(AuthAction.OnToggleRegisterLoginMode)
+                                            }
                                         )
                                     }
                                 }

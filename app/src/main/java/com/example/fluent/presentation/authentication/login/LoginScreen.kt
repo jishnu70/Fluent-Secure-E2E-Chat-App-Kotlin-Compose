@@ -61,7 +61,7 @@ fun LoginScreenRoot(
         state = state,
         onAction = { action ->
             when (action) {
-                is AuthAction.OnToggleRegisterLoginMode -> onRegisterButtonClicked
+                is AuthAction.OnToggleRegisterLoginMode -> onRegisterButtonClicked()
                 else -> Unit
             }
             viewModel.onAction(action = action)
