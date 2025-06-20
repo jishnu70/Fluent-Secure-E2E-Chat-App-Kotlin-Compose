@@ -1,9 +1,13 @@
 package com.example.fluent.data.mapper
 
 import com.example.fluent.data.dto.AuthUserDto
+import com.example.fluent.data.dto.LoginUserDto
+import com.example.fluent.data.dto.RegisterUserDto
 import com.example.fluent.data.dto.TokenResponseDto
 import com.example.fluent.data.dto.UserRegisterResponseDto
 import com.example.fluent.domain.models.AuthUser
+import com.example.fluent.domain.models.LoginUser
+import com.example.fluent.domain.models.RegisterUser
 import com.example.fluent.domain.models.RegisterUserResponse
 import com.example.fluent.domain.models.TokenResponse
 
@@ -29,5 +33,21 @@ fun AuthUser.toDtoUser(): AuthUserDto {
         email = email,
         password = password,
         publicKey = publicKey
+    )
+}
+
+fun RegisterUser.toDtoRegister(): RegisterUserDto {
+    return RegisterUserDto(
+        username = username,
+        email = email,
+        password = password,
+        publicKey = publicKey ?: throw IllegalStateException("public key cannot be null")
+    )
+}
+
+fun LoginUser.toDtoLogin(): LoginUserDto {
+    return LoginUserDto(
+        username = username,
+        password = password
     )
 }

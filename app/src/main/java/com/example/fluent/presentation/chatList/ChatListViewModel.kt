@@ -45,6 +45,10 @@ class ChatListViewModel(
                     selectedChatID = action.chatId
                 )
             }
+
+            ChatListAction.OnSearch -> {
+
+            }
         }
     }
 }

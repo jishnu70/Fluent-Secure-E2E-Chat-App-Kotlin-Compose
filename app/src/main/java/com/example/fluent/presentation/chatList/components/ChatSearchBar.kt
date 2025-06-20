@@ -31,20 +31,22 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.fluent.R
 import com.example.fluent.ui.theme.Brown
 import com.example.fluent.ui.theme.Orange
 import com.example.fluent.ui.theme.Peach
 import com.example.fluent.ui.theme.PeachWhite
 
-@Preview(showBackground = true)
 @Composable
 fun ChatSearchBar(
-
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onImeSearch: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -57,8 +59,9 @@ fun ChatSearchBar(
         )
     ) {
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = searchQuery,
+            textStyle = TextStyle(fontSize = 16.sp),
+            onValueChange = { onSearchQueryChange(it) },
             shape = RoundedCornerShape(50),
             colors = OutlinedTextFieldDefaults.colors(
                 cursorColor = Orange,
@@ -83,7 +86,7 @@ fun ChatSearchBar(
             keyboardActions = KeyboardActions(
                 onSearch = {
                     focusManager.clearFocus()
-//                    onImeSearch()
+                    onImeSearch()
                 }
             ),
             keyboardOptions = KeyboardOptions(
@@ -92,10 +95,10 @@ fun ChatSearchBar(
             ),
             trailingIcon = {
                 AnimatedVisibility(
-                    visible = true //searchQuery.isNotBlank()
+                    visible = searchQuery.isNotBlank()
                 ) {
                     IconButton(
-                        onClick = { }//onSearchQueryChange("") }
+                        onClick = { onSearchQueryChange("") }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Clear,

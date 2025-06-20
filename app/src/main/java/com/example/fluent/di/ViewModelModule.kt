@@ -15,6 +15,10 @@ val ViewModelModule = module {
         )
     }
     viewModel { SplashScreenViewModel(get()) }
-    viewModel { ChatListViewModel(get()) }
+    viewModel {
+        ChatListViewModel(
+            chatRepository = get()
+        )
+    }
     viewModel { MessageViewModel(get()) }
 }

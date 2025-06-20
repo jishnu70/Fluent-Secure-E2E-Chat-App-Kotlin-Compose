@@ -35,7 +35,10 @@ val RepositoryModule = module {
     }
 
     single<WebSocketService> {
-        WebSocketServiceImpl(get(), get())
+        WebSocketServiceImpl(
+            httpClient = get((named("authenticated_client"))),
+            encryptionHelper = get()
+        )
     }
 
     single<ChatRepository> {

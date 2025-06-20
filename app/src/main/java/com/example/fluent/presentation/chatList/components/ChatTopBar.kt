@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -37,7 +38,12 @@ import com.example.fluent.ui.theme.PeachWhite
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatTopBarRoot(scrollBehavior: TopAppBarScrollBehavior) {
+fun ChatTopBarRoot(
+    scrollBehavior: TopAppBarScrollBehavior,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onImeSearch: () -> Unit,
+) {
 
     Surface(
         tonalElevation = 12.dp,
@@ -46,6 +52,7 @@ fun ChatTopBarRoot(scrollBehavior: TopAppBarScrollBehavior) {
     ) {
         TopAppBar(
             modifier = Modifier
+                .height(150.dp)
                 .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp)),
             title = {
                 Column(
@@ -100,7 +107,12 @@ fun ChatTopBarRoot(scrollBehavior: TopAppBarScrollBehavior) {
                             )
                         }
                     }
-                    ChatSearchBar()
+                    Spacer(modifier = Modifier.height(10.dp))
+                    ChatSearchBar(
+                        searchQuery = searchQuery,
+                        onSearchQueryChange = { onSearchQueryChange(it) },
+                        onImeSearch = { onImeSearch() },
+                    )
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = PeachWhite),

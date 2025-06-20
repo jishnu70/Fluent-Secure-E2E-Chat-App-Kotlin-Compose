@@ -3,7 +3,8 @@ package com.example.fluent.presentation.authentication
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fluent.domain.models.AuthUser
+import com.example.fluent.domain.models.LoginUser
+import com.example.fluent.domain.models.RegisterUser
 import com.example.fluent.domain.repository.AuthRepository
 import com.example.fluent.domain.utility.Email
 import com.example.fluent.domain.utility.KeyManager
@@ -54,26 +55,26 @@ class AuthViewModel(
             is AuthAction.OnSubmit -> {
                 viewModelScope.launch {
                     Log.d("AuthViewModel", "onAction: Submitting")
-                    val user = AuthUser(
-                        username = _state.value.username,
-                        email = _state.value.email,
-                        password = _state.value.password
-                    )
                     _state.value = _state.value.copy(
                         isLoading = true
                     )
                     runCatching {
                         if (_state.value.registerNewUser) {
                             val getPublicKey = keyManager.getPublicKey()
-                            val userWithPublicKey = user.copy(publicKey = getPublicKey, email = user.username)
+                            val user = RegisterUser(
+                                username = _state.value.username,
+                                email = _state.value.email!!,
+                                password = _state.value.password,
+                                publicKey = getPublicKey
+                            )
                             if (_state.value.password.contentEquals( _state.value.confirmPassword)){
-                                validateEmailOrNull(userWithPublicKey.email)?.let { error ->
+                                validateEmailOrNull(user.email)?.let { error ->
                                     _state.update { it.copy(error = error) }
                                     return@launch
                                 }
                                 Log.d("AuthViewModel", "onAction: Registering new user")
-                                Log.d("AuthViewModel", "onAction: User: $userWithPublicKey")
-                                authRepository.registerNewUser(userWithPublicKey)
+                                Log.d("AuthViewModel", "onAction: User: $user")
+                                authRepository.registerNewUser(user)
                             } else {
                                 _state.update {
                                     it.copy(error = "Passwords do not match")
@@ -82,6 +83,11 @@ class AuthViewModel(
                                 return@launch
                             }
                         } else {
+                            val user = LoginUser(
+                                username = _state.value.username,
+                                password = _state.value.password
+                            )
+                            Log.d("AuthViewModel", "onAction: User: $user")
                             Log.d("AuthViewModel", "onAction: Logging in user")
                             authRepository.loginUser(user)
                         }

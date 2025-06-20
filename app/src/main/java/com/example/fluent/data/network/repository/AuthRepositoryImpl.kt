@@ -4,26 +4,30 @@ import android.util.Log
 import com.example.fluent.data.dto.TokenResponseDto
 import com.example.fluent.data.dto.UserRegisterResponseDto
 import com.example.fluent.data.mapper.toDomainTokenResponse
-import com.example.fluent.data.mapper.toDtoUser
+import com.example.fluent.data.mapper.toDtoLogin
+import com.example.fluent.data.mapper.toDtoRegister
 import com.example.fluent.data.network.AuthRoutes
-import com.example.fluent.domain.models.AuthUser
+import com.example.fluent.data.remote.TokenManager
+import com.example.fluent.domain.models.LoginUser
+import com.example.fluent.domain.models.RegisterUser
 import com.example.fluent.domain.models.TokenResponse
 import com.example.fluent.domain.repository.AuthRepository
-import com.example.fluent.data.remote.TokenManager
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 
 class AuthRepositoryImpl(
     private val httpClient: HttpClient,
     private val tokenManager: TokenManager
 ) : AuthRepository {
-    override suspend fun registerNewUser(newUser: AuthUser): Result<TokenResponse> {
+    override suspend fun registerNewUser(newUser: RegisterUser): Result<TokenResponse> {
         try {
             val result = httpClient.post(AuthRoutes.REGISTER) {
-                setBody(newUser.toDtoUser())
+                setBody(newUser.toDtoRegister())
             }
             Log.d("Register request sent: ", "Result: $result")
             if (result.status.isSuccess()) {
@@ -53,10 +57,11 @@ class AuthRepositoryImpl(
         }
     }
 
-    override suspend fun loginUser(user: AuthUser): Result<TokenResponse> {
+    override suspend fun loginUser(user: LoginUser): Result<TokenResponse> {
         return try {
             val result = httpClient.post(AuthRoutes.LOGIN) {
-                setBody(user.toDtoUser())
+                contentType(ContentType.Application.Json)
+                setBody(user.toDtoLogin())
             }
             Log.d("Login Request sent", "Result: $result")
             if (result.status.isSuccess()) {
@@ -76,6 +81,7 @@ class AuthRepositoryImpl(
                 Result.failure(Exception("Login failed: HTTP ${result.status}"))
             }
         } catch (e: Exception) {
+            Log.e("LoginError", "Exception during login: ${e.localizedMessage}", e)
             Result.failure(e)
         }
     }
@@ -84,7 +90,7 @@ class AuthRepositoryImpl(
         username: String,
         password: String
     ): Result<TokenResponse> =
-        loginUser(user = AuthUser(username = username, password = password))
+        loginUser(user = LoginUser(username = username, password = password))
 
     override suspend fun checkUserLogin(): Boolean {
         return tokenManager.isLoggedIn()

@@ -78,7 +78,6 @@ fun AppNavigationGraph(
                 onMenuClick = {
                     showMenuDrawer.value = true
                 },
-                viewModel = TODO(),
                 onNonMenuClick = { route ->
                     showMenuDrawer.value = false
                     navController.navigate(route) {
@@ -90,6 +89,7 @@ fun AppNavigationGraph(
                     }
                 },
                 showMenuDrawer = showMenuDrawer.value,
+                onShowMenuClose = { showMenuDrawer.value = it }
             )
         }
 
@@ -97,6 +97,10 @@ fun AppNavigationGraph(
             MessageScreenRoot(
                 onBackClick = { navController.popBackStack() }
             )
+        }
+
+        composable(route = AppScreenRoutes.UserSearchScreen.route) {
+
         }
     }
 }
