@@ -84,6 +84,10 @@ fun MessageScreenRoot(
                                     is MessageAction.OnSendMessage -> {
                                         viewModel.onAction(action = action)
                                     }
+
+                                    is MessageAction.OnMessageChange -> {
+                                        viewModel.onAction(action = action)
+                                    }
                                 }
                             }
                         )

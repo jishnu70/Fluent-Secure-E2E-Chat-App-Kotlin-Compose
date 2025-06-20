@@ -82,7 +82,7 @@ fun MessageTextField(
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxSize()
+//                .fillMaxSize()
                 .weight(3f)
                 .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
                 .align(Alignment.CenterVertically),
