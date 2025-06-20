@@ -1,6 +1,6 @@
 package com.example.fluent.data.network
 
-const val BASE_URL = "https://cryptalkfastapi.onrender.com/"
+const val BASE_URL = "https://cryptalkfastapi.onrender.com"
 
 object AuthRoutes {
     const val REGISTER = "$BASE_URL/auth/register"

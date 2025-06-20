@@ -1,5 +1,6 @@
 package com.example.fluent.presentation.authentication
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fluent.domain.models.AuthUser
@@ -52,6 +53,7 @@ class AuthViewModel(
 
             is AuthAction.OnSubmit -> {
                 viewModelScope.launch {
+                    Log.d("AuthViewModel", "onAction: Submitting")
                     val user = AuthUser(
                         username = _state.value.username,
                         email = _state.value.email,
@@ -63,20 +65,24 @@ class AuthViewModel(
                     runCatching {
                         if (_state.value.registerNewUser) {
                             val getPublicKey = keyManager.getPublicKey()
-                            val userWithPublicKey = user.copy(publicKey = getPublicKey)
+                            val userWithPublicKey = user.copy(publicKey = getPublicKey, email = user.username)
                             if (_state.value.password.contentEquals( _state.value.confirmPassword)){
-                                validateEmailOrNull(_state.value.email)?.let { error ->
+                                validateEmailOrNull(userWithPublicKey.email)?.let { error ->
                                     _state.update { it.copy(error = error) }
                                     return@launch
                                 }
+                                Log.d("AuthViewModel", "onAction: Registering new user")
+                                Log.d("AuthViewModel", "onAction: User: $userWithPublicKey")
                                 authRepository.registerNewUser(userWithPublicKey)
                             } else {
                                 _state.update {
                                     it.copy(error = "Passwords do not match")
                                 }
+                                Log.d("AuthViewModel", "onAction: Passwords do not match")
                                 return@launch
                             }
                         } else {
+                            Log.d("AuthViewModel", "onAction: Logging in user")
                             authRepository.loginUser(user)
                         }
                     }.onSuccess { result ->
@@ -85,13 +91,16 @@ class AuthViewModel(
                                 isAuthenticated = true,
                                 error = null
                             )
+                            Log.d("AuthViewModel", "onAction: Success")
                         } else {
                             _state.value = _state.value.copy(
                                 error = result.exceptionOrNull()?.message ?: "Unknown error"
                             )
+                            Log.d("AuthViewModel", "onAction: Error")
                         }
                     }.onFailure {
                         _state.value = _state.value.copy(error = it.message)
+                        Log.d("AuthViewModel", "onAction: Failure")
                     }
                     _state.value = _state.value.copy(
                         isLoading = false

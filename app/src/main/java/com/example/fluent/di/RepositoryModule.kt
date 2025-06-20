@@ -3,6 +3,7 @@ package com.example.fluent.di
 import com.example.fluent.data.network.repository.AuthRepositoryImpl
 import com.example.fluent.data.network.repository.ChatRepositoryImpl
 import com.example.fluent.data.network.repository.WebSocketServiceImpl
+import com.example.fluent.data.remote.EncryptionHelper
 import com.example.fluent.data.remote.TokenManager
 import com.example.fluent.domain.repository.AuthRepository
 import com.example.fluent.domain.repository.ChatRepository
@@ -22,15 +23,27 @@ val RepositoryModule = module {
         KeyManager
     }
 
-    single<AuthRepository> {
-        AuthRepositoryImpl(get((named("unauthenticated_client"))), get())
+    single {
+        EncryptionHelper()
     }
 
-    single<ChatRepository> {
-        ChatRepositoryImpl(get((named("authenticated_client"))), get(), get(), get())
+    single<AuthRepository> {
+        AuthRepositoryImpl(
+            httpClient = get((named("unauthenticated_client"))),
+            tokenManager = get()
+        )
     }
 
     single<WebSocketService> {
         WebSocketServiceImpl(get(), get())
+    }
+
+    single<ChatRepository> {
+        ChatRepositoryImpl(
+            httpClient = get((named("authenticated_client"))),
+            tokenManager = get(),
+            webSocketService = get(),
+            encryptionHelper = get()
+        )
     }
 }

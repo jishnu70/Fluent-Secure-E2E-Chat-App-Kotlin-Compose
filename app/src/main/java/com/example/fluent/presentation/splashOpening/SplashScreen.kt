@@ -25,7 +25,7 @@ fun SplashScreenRoot(
     val state = viewModel.state.collectAsStateWithLifecycle().value
 
     LaunchedEffect(Unit) {
-        delay(2000)
+        delay(500)
         if (state.isLoggedIn == true) {
             onLoggedIn()
         } else {

@@ -139,7 +139,7 @@ private fun LoginScreen(
                         keyboardType = KeyboardType.Email,
                         visualTransformation = VisualTransformation.None,
                         onChanged = { newEmail ->
-                            onAction(AuthAction.OnEmailChange(newEmail.text))
+                            onAction(AuthAction.OnUserNameChange(newEmail.text))
                         }
                     )
                     Spacer(modifier = Modifier.height(20.dp))

@@ -7,9 +7,12 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.header
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
 import org.koin.core.qualifier.named
@@ -18,8 +21,12 @@ import org.koin.dsl.module
 val NetworkModule = module {
     single(named("unauthenticated_client")) {
         HttpClient {
-            install(ContentNegotiation) { json() }
-            expectSuccess = false
+            install(ContentNegotiation) {
+                json()
+            }
+            defaultRequest {
+                contentType(ContentType.Application.Json)
+            }
         }
     }
 

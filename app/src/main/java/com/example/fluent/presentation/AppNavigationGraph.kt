@@ -1,7 +1,10 @@
 package com.example.fluent.presentation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -18,6 +21,8 @@ fun AppNavigationGraph(
     modifier: Modifier,
 ) {
     val navController = rememberNavController()
+
+    val showMenuDrawer = remember { mutableStateOf(false) }
 
     NavHost(navController = navController, startDestination = AppScreenRoutes.SplashScreen.route) {
         composable(route = AppScreenRoutes.SplashScreen.route) {
@@ -66,9 +71,25 @@ fun AppNavigationGraph(
 
         composable(route = AppScreenRoutes.ChatListScreen.route) {
             ChatListScreenRoot(
+                navController = navController,
                 onChatClick = {
                     navController.navigate("${AppScreenRoutes.MessageScreen.route}/${it}")
-                }
+                },
+                onMenuClick = {
+                    showMenuDrawer.value = true
+                },
+                viewModel = TODO(),
+                onNonMenuClick = { route ->
+                    showMenuDrawer.value = false
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                showMenuDrawer = showMenuDrawer.value,
             )
         }
 

@@ -28,6 +28,6 @@ fun AuthUser.toDtoUser(): AuthUserDto {
         username = username,
         email = email,
         password = password,
-        publicKey = publicKey ?: throw IllegalStateException("public key cannot be null")
+        publicKey = publicKey
     )
 }

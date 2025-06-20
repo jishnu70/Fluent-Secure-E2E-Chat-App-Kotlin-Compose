@@ -22,6 +22,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.example.fluent.presentation.bottomNavigation.BottomNavigation
 import com.example.fluent.presentation.chatList.components.ChatListItem
 import com.example.fluent.presentation.chatList.components.ChatTopBarRoot
 import org.koin.androidx.compose.koinViewModel
@@ -30,7 +32,11 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ChatListScreenRoot(
     viewModel: ChatListViewModel = koinViewModel(),
+    navController: NavController,
     onChatClick: (Int) -> Unit,
+    onMenuClick: () -> Unit,
+    onNonMenuClick: (String) -> Unit,
+    showMenuDrawer: Boolean
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
 
@@ -49,6 +55,14 @@ fun ChatListScreenRoot(
                 })
             },
         topBar = { ChatTopBarRoot(scrollBehavior = scrollBehavior) },
+        bottomBar = {
+            BottomNavigation(
+                navController = navController,
+                showMenuDrawer = showMenuDrawer,
+                onMenuClick = onMenuClick,
+                onNonMenuClick = onNonMenuClick
+            )
+        }
     ) { innerPadding ->
         Surface(
             modifier = Modifier

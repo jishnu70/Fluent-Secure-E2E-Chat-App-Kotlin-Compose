@@ -48,6 +48,7 @@ class AuthRepositoryImpl(
                 return Result.failure(Exception("Failed to register user: ${result.status}"))
             }
         } catch (e: Exception) {
+            Log.e("RegisterNewUser", "Exception: ${e.localizedMessage}", e)
             return Result.failure(e)
         }
     }
