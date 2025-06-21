@@ -63,7 +63,7 @@ class AuthViewModel(
                             val getPublicKey = keyManager.getPublicKey()
                             val user = RegisterUser(
                                 username = _state.value.username,
-                                email = _state.value.email!!,
+                                email = _state.value.username,
                                 password = _state.value.password,
                                 publicKey = getPublicKey
                             )

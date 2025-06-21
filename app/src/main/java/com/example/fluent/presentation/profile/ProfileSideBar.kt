@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -65,7 +64,7 @@ fun ProfileSideBar(
                 modifier = Modifier
                     .matchParentSize()
                     .padding(16.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 when {
@@ -78,34 +77,43 @@ fun ProfileSideBar(
                     }
 
                     else -> {
-                        Box(
-                            modifier = Modifier
-                                .padding(top = 16.dp)
-                                .size(200.dp),
-                            contentAlignment = Alignment.Center
+                        Column(
+                            modifier = Modifier.weight(0.75f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            Image(
-                                painter = painterResource(R.drawable.user_circle),
-                                contentDescription = "User Profile Icon",
-                                colorFilter = ColorFilter.tint(Peach),
-                                modifier = Modifier.fillMaxSize()
+                            Box(
+                                modifier = Modifier
+                                    .padding(top = 16.dp)
+                                    .size(200.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.user_circle),
+                                    contentDescription = "User Profile Icon",
+                                    colorFilter = ColorFilter.tint(Peach),
+                                    modifier = Modifier.matchParentSize()
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                "Profile",
+                                modifier = Modifier.clickable { /* Action */ },
+                                style = MaterialTheme.typography.headlineLarge
                             )
                         }
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            "Profile",
-                            modifier = Modifier.clickable { /* Action */ },
-                            style = MaterialTheme.typography.headlineLarge
-                        )
-                        Text(
-                            "Logout", modifier = Modifier.clickable {
-                                viewModel.onAction(
-                                    ProfileAction.OnLogout
-                                )
-                                onLogOutButtonClicked()
-                            },
-                            style = MaterialTheme.typography.headlineLarge
-                        )
+
+                        Box(modifier = Modifier.weight(0.25f)) {
+                            Text(
+                                "Logout", modifier = Modifier.align(Alignment.BottomCenter).clickable {
+                                    viewModel.onAction(
+                                        ProfileAction.OnLogout
+                                    )
+                                    onLogOutButtonClicked()
+                                },
+                                style = MaterialTheme.typography.headlineLarge
+                            )
+                        }
                     }
                 }
 //                Text("Settings", modifier = Modifier.clickable { /* Action */ })

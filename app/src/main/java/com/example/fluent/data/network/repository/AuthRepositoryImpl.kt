@@ -26,6 +26,7 @@ class AuthRepositoryImpl(
 ) : AuthRepository {
     override suspend fun registerNewUser(newUser: RegisterUser): Result<TokenResponse> {
         try {
+            Log.d("RegisterDebug", "Sending register request: ${newUser.toDtoRegister()}")
             val result = httpClient.post(AuthRoutes.REGISTER) {
                 setBody(newUser.toDtoRegister())
             }
