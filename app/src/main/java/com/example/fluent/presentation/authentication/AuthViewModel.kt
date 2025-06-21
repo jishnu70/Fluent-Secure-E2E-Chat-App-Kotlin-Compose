@@ -105,6 +105,7 @@ class AuthViewModel(
                             Log.d("AuthViewModel", "onAction: Error")
                         }
                     }.onFailure {
+                        Log.d("AuthViewModel", "${it.localizedMessage}")
                         _state.value = _state.value.copy(error = it.message)
                         Log.d("AuthViewModel", "onAction: Failure")
                     }

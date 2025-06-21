@@ -48,7 +48,9 @@ fun ChatListScreenRoot(
     onMenuClick: () -> Unit,
     onNonMenuClick: (String) -> Unit,
     showMenuDrawer: Boolean,
-    onShowMenuClose: (Boolean) -> Unit
+    onShowMenuClose: (Boolean) -> Unit,
+    onUserNotLoggedIn: () -> Unit,
+    onLogOutButtonClicked: () -> Unit
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
     val keyBoardController = LocalSoftwareKeyboardController.current
@@ -108,6 +110,10 @@ fun ChatListScreenRoot(
                         Text(text = state.error)
                     }
 
+                    state.isLoggedId == false -> {
+                        onUserNotLoggedIn()
+                    }
+
                     else -> {
                         ChatList(
                             state = state,
@@ -136,7 +142,8 @@ fun ChatListScreenRoot(
 
         ProfileSideBar(
             modifier = Modifier.align(Alignment.CenterEnd),
-            showMenuDrawer = showMenuDrawer
+            showMenuDrawer = showMenuDrawer,
+            onLogOutButtonClicked = onLogOutButtonClicked
         )
     }
 }
