@@ -5,6 +5,7 @@ import com.example.fluent.presentation.chatList.ChatListViewModel
 import com.example.fluent.presentation.message.MessageViewModel
 import com.example.fluent.presentation.profile.ProfileViewModel
 import com.example.fluent.presentation.splashOpening.SplashScreenViewModel
+import com.example.fluent.presentation.userSearch.UserSearchViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -22,7 +23,14 @@ val ViewModelModule = module {
             tokenManager = get()
         )
     }
-    viewModel { MessageViewModel(get()) }
+    viewModel { MessageViewModel(get(), get()) }
 
     viewModel { ProfileViewModel(get()) }
+
+    viewModel {
+        UserSearchViewModel(
+            authRepository = get(),
+            tokenManager = get(),
+        )
+    }
 }

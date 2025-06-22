@@ -3,8 +3,10 @@ package com.example.fluent.data.network.repository
 import android.util.Log
 import com.example.fluent.data.dto.MessageChatListDto
 import com.example.fluent.data.dto.MessageResponseDto
+import com.example.fluent.data.dto.PartnerInfoResponseDto
 import com.example.fluent.data.mapper.toDomainChatList
 import com.example.fluent.data.mapper.toDomainMessage
+import com.example.fluent.data.mapper.toDomainPartnerInfo
 import com.example.fluent.data.mapper.toRSAPublicKey
 import com.example.fluent.data.network.MessageRoutes
 import com.example.fluent.data.network.WebSocketRoutes
@@ -65,24 +67,30 @@ class ChatRepositoryImpl(
                 val response = try {
                     result.body<List<MessageResponseDto>>()
                 } catch (e: Exception) {
+                    Log.d("GetAllMessage", "Exception: ${e.localizedMessage ?: "getting response"}")
                     return Result.failure(Exception("Invalid server response", e))
                 }
                 Log.d("GetAllMessage request received: ", "Response: $response")
-                val messageList = try {
-                    response.map {
-                        val decrypted =
-                            encryptionHelper.decrypt(it.content, KeyManager.getPrivateKey()!!)
-                        it.copy(content = decrypted)
-                            .toDomainMessage(receiverIDWebSocket = receiverId)
+                val privateKey = KeyManager.getPrivateKey()
+                if (privateKey == null) {
+                    Log.d("GetAllMessage", "Private key not found.")
+                    return Result.failure(Exception("Missing private key"))
+                }
+                val messageList = response.mapNotNull { msg ->
+                    try {
+                        val decrypted = encryptionHelper.decrypt(msg.content, privateKey)
+                        msg.copy(content = decrypted).toDomainMessage(receiverIDWebSocket = receiverId)
+                    } catch (e: Exception) {
+                        Log.d("GetAllMessage", "Decryption failed for message id ${msg.senderID}->${msg.receiverID}, skipping")
+                        null  // skip bad messages
                     }
-                } catch (e: Exception) {
-                    return Result.failure(Exception("Invalid server response", e))
                 }
                 return Result.success(messageList)
             } else {
                 return Result.failure(Exception("Failed to retrieve GetAllMessage: ${result.status}"))
             }
         } catch (e: Exception) {
+            Log.d("GetAllMessage", "Exception: ${e.localizedMessage ?: "all exception"}")
             return Result.failure(e)
         }
     }
@@ -109,6 +117,40 @@ class ChatRepositoryImpl(
             }
         } catch (e: Exception) {
             Log.d("ChatRepositoryImpl", "Error connecting to chat: ${e.message}")
+            return Result.failure(e)
+        }
+    }
+
+    override suspend fun getPartnerInfo(receiverId: Int): Result<PartnerInfo> {
+        try {
+            val result = httpClient.get(MessageRoutes.PARTNER_INFO) {
+                url {
+                    parameters.append(name = "partnerID", value = receiverId.toString())
+                }
+            }
+            Log.d("PartnerInfo request sent: ", "Result: $result")
+            if (result.status.isSuccess()) {
+                val response = try {
+                    result.body<PartnerInfoResponseDto>()
+                } catch (e: Exception) {
+                    return Result.failure(Exception("Invalid server response", e))
+                }
+                Log.d("PartnerInfo request received: ", "Response: $response")
+                if (response != null) {
+                    val partnerInfo = try {
+                        response.toDomainPartnerInfo()
+                    } catch (e: Exception) {
+                        return Result.failure(Exception("Invalid server response", e))
+                    }
+                    return Result.success(partnerInfo)
+                } else {
+                    return Result.failure(Exception("PartnerInfo is null"))
+                }
+            } else {
+                return Result.failure(Exception("Failed to retrieve PartnerInfo: ${result.status}"))
+            }
+        } catch (e: Exception) {
+            Log.d("ChatRepositoryImpl", "Error getting partner info: ${e.message}")
             return Result.failure(e)
         }
     }

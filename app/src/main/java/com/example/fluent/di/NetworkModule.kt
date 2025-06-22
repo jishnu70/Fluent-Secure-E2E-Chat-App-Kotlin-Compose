@@ -8,6 +8,7 @@ import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -15,9 +16,13 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
+@OptIn(ExperimentalSerializationApi::class)
 val NetworkModule = module {
     single(named("unauthenticated_client")) {
         HttpClient {
@@ -30,14 +35,24 @@ val NetworkModule = module {
         }
     }
 
+    val json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        prettyPrint = false
+        encodeDefaults = true
+        namingStrategy = JsonNamingStrategy.SnakeCase
+    }
+
     single(named("authenticated_client")) {
         val tokenManager: TokenManager = get()
         val authRepository: AuthRepository = get()
 
         HttpClient {
             install(ContentNegotiation) {
-                json() // kotlinx.serialization
+                json(json) // kotlinx.serialization
             }
+
+            install(WebSockets)
             expectSuccess = false
 
             install(DefaultRequest) {

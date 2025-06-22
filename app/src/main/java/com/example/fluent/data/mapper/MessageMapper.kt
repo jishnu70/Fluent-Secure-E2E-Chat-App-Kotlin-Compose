@@ -14,7 +14,6 @@ fun MessageResponseDto.toDomainMessage(receiverIDWebSocket: Int): Message {
         isFromUser = (receiverID == receiverIDWebSocket),
         content = content,
         messageType = messageType,
-        attachmentID = attachmentID,
         timestamp = timestamp
     )
 }
@@ -24,7 +23,6 @@ fun MessageCreate.toDataMessage(receiverIDWebSocket: Int): MessageCreateDto {
         receiverID = receiverIDWebSocket,
         content = content,
         messageType = messageType,
-        attachmentID = attachmentID,
     )
 }
 

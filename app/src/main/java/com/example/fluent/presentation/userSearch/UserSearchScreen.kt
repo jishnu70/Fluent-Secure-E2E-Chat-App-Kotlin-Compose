@@ -35,6 +35,7 @@ import com.example.fluent.presentation.bottomNavigation.BottomNavigation
 import com.example.fluent.presentation.chatList.components.ChatTopBarRoot
 import com.example.fluent.presentation.profile.ProfileSideBar
 import com.example.fluent.presentation.userSearch.components.UserListItem
+import com.example.fluent.presentation.userSearch.components.UserSearchTopBarRoot
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,7 +73,7 @@ fun UserSearchScreenRoot(
                     })
                 },
             topBar = {
-                ChatTopBarRoot(
+                UserSearchTopBarRoot(
                     scrollBehavior = scrollBehavior,
                     searchQuery = state.searchQuery,
                     onSearchQueryChange = {

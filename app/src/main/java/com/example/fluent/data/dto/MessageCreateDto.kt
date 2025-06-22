@@ -7,5 +7,5 @@ data class MessageCreateDto(
     val receiverID: Int,
     val content: String,
     val messageType: String,
-    val attachmentID: Int? = null
+//    val attachmentID: Int? = null
 )

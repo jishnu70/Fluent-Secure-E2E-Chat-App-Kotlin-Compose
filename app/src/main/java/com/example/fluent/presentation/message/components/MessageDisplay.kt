@@ -40,7 +40,7 @@ fun MessageDisplay(
                 .background(if (message.isFromUser)Peach else Peach.copy(alpha = 0.4f))
                 .padding(16.dp)
         ) {
-            Text(text = "Hello from ${message.content}")
+            Text(text = message.content)
         }
     }
 }

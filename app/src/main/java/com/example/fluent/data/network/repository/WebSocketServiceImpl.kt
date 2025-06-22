@@ -5,16 +5,14 @@ import com.example.fluent.data.dto.MessageCreateDto
 import com.example.fluent.data.dto.MessageResponseDto
 import com.example.fluent.data.mapper.toDataMessage
 import com.example.fluent.data.mapper.toDomainMessage
+import com.example.fluent.data.remote.EncryptionHelper
 import com.example.fluent.domain.models.Message
 import com.example.fluent.domain.models.MessageCreate
 import com.example.fluent.domain.repository.WebSocketService
-import com.example.fluent.data.remote.EncryptionHelper
 import com.example.fluent.domain.utility.KeyManager
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocketSession
-import io.ktor.client.request.header
 import io.ktor.client.request.url
-import io.ktor.http.HttpHeaders
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.close
@@ -41,11 +39,17 @@ class WebSocketServiceImpl(
     override fun connect(url: String, token: String, receiverId: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                Log.d("TOKEN_PHYSICAL", token)
+                if (token.isBlank()) {
+                    Log.e("WebSocketServiceImpl", "Cannot connect: token is blank")
+                    return@launch
+                }
+                val fullUrl = "$url?token=$token"
                 session = httpClient.webSocketSession {
-                    url(url)
-                    header(HttpHeaders.Authorization, "Bearer $token")
+                    url(fullUrl)
                 }
                 _receiverId = receiverId
+                Log.d("WebSocketServiceImpl", "Connected to $url")
                 listenForIncomingMessages()
             } catch (e: Exception) {
                 println("WebSocket connection failed: ${e.message}")

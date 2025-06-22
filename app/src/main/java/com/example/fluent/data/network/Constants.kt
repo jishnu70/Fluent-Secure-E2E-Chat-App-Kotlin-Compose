@@ -16,5 +16,5 @@ object MessageRoutes {
 }
 
 object WebSocketRoutes {
-    const val CHAT = "wss://cryptalkfastapi.onrender.com/ws/chat"
+    const val CHAT = "wss://cryptalkfastapi.onrender.com/chat/ws"
 }

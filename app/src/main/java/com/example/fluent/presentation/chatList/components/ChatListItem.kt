@@ -1,5 +1,7 @@
 package com.example.fluent.presentation.chatList.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,12 +31,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.fluent.R
 import com.example.fluent.domain.models.ChatList
 import com.example.fluent.ui.theme.Brown
 import com.example.fluent.ui.theme.Peach
 import com.example.fluent.ui.theme.PeachWhite
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun formatTimestamp(timestamp: String): String {
+    val instant = Instant.parse(timestamp)
+    val zoneId = ZoneId.systemDefault()
+    val localDateTime = instant.atZone(zoneId).toLocalDateTime()
+    val messageDate = localDateTime.toLocalDate()
+    val currentDate = LocalDate.now(zoneId)
+
+    return when {
+        messageDate == currentDate -> localDateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+        messageDate == currentDate.minusDays(1) -> "Yesterday"
+        else -> localDateTime.format(DateTimeFormatter.ofPattern("dd MMM"))
+    }
+}
 
 @Composable
 fun ChatListItem(
@@ -97,14 +119,14 @@ fun ChatListItem(
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = chat.partner.user_name,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         color = Brown,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = "09:09",
+                        text = formatTimestamp(chat.message.timestamp),
                         style = MaterialTheme.typography.bodyLarge,
                         color = Brown,
                         fontWeight = FontWeight.Bold,
@@ -120,7 +142,9 @@ fun ChatListItem(
                     style = MaterialTheme.typography.labelLarge,
                     color = Brown.copy(alpha = 0.7f),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
