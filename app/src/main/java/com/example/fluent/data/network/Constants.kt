@@ -6,6 +6,7 @@ object AuthRoutes {
     const val REGISTER = "$BASE_URL/auth/register"
     const val LOGIN = "$BASE_URL/auth/login"
     const val REFRESH_TOKEN = "$BASE_URL/auth/refresh"
+    const val GET_ALL_USER = "$BASE_URL/auth/get_all_users"
 }
 
 object MessageRoutes {

@@ -1,19 +1,23 @@
 package com.example.fluent.data.network.repository
 
 import android.util.Log
+import com.example.fluent.data.dto.PartnerInfoResponseDto
 import com.example.fluent.data.dto.TokenResponseDto
 import com.example.fluent.data.dto.UserRegisterResponseDto
+import com.example.fluent.data.mapper.toDomainPartnerInfo
 import com.example.fluent.data.mapper.toDomainTokenResponse
 import com.example.fluent.data.mapper.toDtoLogin
 import com.example.fluent.data.mapper.toDtoRegister
 import com.example.fluent.data.network.AuthRoutes
 import com.example.fluent.data.remote.TokenManager
 import com.example.fluent.domain.models.LoginUser
+import com.example.fluent.domain.models.PartnerInfo
 import com.example.fluent.domain.models.RegisterUser
 import com.example.fluent.domain.models.TokenResponse
 import com.example.fluent.domain.repository.AuthRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -119,6 +123,34 @@ class AuthRepositoryImpl(
             }
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    override suspend fun getAllUser(userName: String): Result<List<PartnerInfo>> {
+        try {
+            val result = httpClient.get(AuthRoutes.GET_ALL_USER) {
+                url {
+                    parameters.append("search", userName)
+                }
+            }
+            if (result.status.isSuccess()) {
+                val response = try {
+                    result.body<List<PartnerInfoResponseDto>>()
+                } catch (e: Exception) {
+                    return Result.failure(Exception("Invalid server response", e))
+                }
+                if (response.isNotEmpty()) {
+                    val partnerInfo = response.map { it.toDomainPartnerInfo() }
+                    return Result.success(partnerInfo)
+                } else {
+                    return Result.failure(Exception("Failed to get all users: ${result.status}"))
+                }
+            } else {
+                return Result.failure(Exception("Failed to get all users: ${result.status}"))
+            }
+        } catch (e: Exception) {
+            Log.d("getAllUser", "Exception: ${e.localizedMessage}")
+            return Result.failure(e)
         }
     }
 

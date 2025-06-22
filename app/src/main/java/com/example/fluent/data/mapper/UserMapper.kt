@@ -2,11 +2,13 @@ package com.example.fluent.data.mapper
 
 import com.example.fluent.data.dto.AuthUserDto
 import com.example.fluent.data.dto.LoginUserDto
+import com.example.fluent.data.dto.PartnerInfoResponseDto
 import com.example.fluent.data.dto.RegisterUserDto
 import com.example.fluent.data.dto.TokenResponseDto
 import com.example.fluent.data.dto.UserRegisterResponseDto
 import com.example.fluent.domain.models.AuthUser
 import com.example.fluent.domain.models.LoginUser
+import com.example.fluent.domain.models.PartnerInfo
 import com.example.fluent.domain.models.RegisterUser
 import com.example.fluent.domain.models.RegisterUserResponse
 import com.example.fluent.domain.models.TokenResponse
