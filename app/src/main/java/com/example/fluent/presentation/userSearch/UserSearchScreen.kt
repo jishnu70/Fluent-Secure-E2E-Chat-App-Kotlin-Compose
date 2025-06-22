@@ -166,7 +166,7 @@ private fun UserList(
     ) {
         items(state.userList) { user ->
             UserListItem(
-                chat = user,
+                user = user,
                 onChatClick = { onAction(UserSearchAction.OnChatClick(it.id)) }
             )
         }
