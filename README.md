@@ -28,7 +28,7 @@
 
 ### 🔐 Login & Register
 <p float="left">
-  <img src="assets/login.png" width="300"  alt=""/>
+  <img src="assets/login.png" width="200"  alt=""/>
   <img src="assets/register.png" width="200"  alt=""/>
 </p>
 
@@ -42,9 +42,6 @@
 <p float="left">
   <img src="assets/userSearch.png" width="200"  alt=""/>
 </p>
-
-
-> _To be added: Chat UI, Login Flow, Message Decryption, Drawer Menu_
 
 ---
 
