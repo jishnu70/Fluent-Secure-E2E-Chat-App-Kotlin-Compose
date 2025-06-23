@@ -31,16 +31,14 @@ class MessageViewModel(
     init {
         // ✅ Always listen to incoming messages once
         viewModelScope.launch {
+            val id = System.currentTimeMillis()
+            Log.d("MessageCollector", "Started collector: $id")
             webSocketService.incomingMessages.collect { message ->
-                val currentChatId = currentChatId ?: return@collect
-                if (message.isFromUser || !message.isFromUser) {
-                    _state.update { current ->
-                        current.copy(
-                            messages = listOf(message) + current.messages
-                        )
-                    }
-                } else {
-                    Log.d("MessageViewModel", "Message ignored (not for this chat)")
+                Log.d("MessageCollector", "[$id] Got message: ${message.content}")
+                _state.update { current ->
+                    current.copy(
+                        messages = listOf(message) + current.messages
+                    )
                 }
             }
         }

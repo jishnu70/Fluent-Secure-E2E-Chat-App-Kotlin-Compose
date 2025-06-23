@@ -1,9 +1,13 @@
 package com.example.fluent.data.remote
 
 import android.util.Base64
+import android.util.Log
+import java.security.InvalidKeyException
 import java.security.PrivateKey
 import java.security.PublicKey
+import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
+import javax.crypto.IllegalBlockSizeException
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 class EncryptionHelper {
@@ -19,10 +23,30 @@ class EncryptionHelper {
     }
 
     @OptIn(ExperimentalEncodingApi::class)
-    fun decrypt(encryptedMessage: String, privateKey: PrivateKey): String {
-        val cipher = cipher
-        cipher.init(Cipher.DECRYPT_MODE, privateKey)
-        val decryptedBytes = cipher.doFinal(Base64.decode(encryptedMessage, Base64.NO_WRAP))
-        return String(decryptedBytes, Charsets.UTF_8)
+    fun decrypt(encryptedMessage: String, privateKey: PrivateKey): String? {
+        try {
+            val cipher = cipher
+            cipher.init(Cipher.DECRYPT_MODE, privateKey)
+            val decodedBytes = Base64.decode(encryptedMessage, Base64.NO_WRAP)
+            Log.d("EncryptionHelper", "Base64 decoded length: ${decodedBytes.size}")
+            Log.d("EncryptionHelper", "🔓 Decrypting with: ${Base64.decode(encryptedMessage, Base64.NO_WRAP).size} bytes")
+            val decryptedBytes = cipher.doFinal(decodedBytes)
+            return String(decryptedBytes, Charsets.UTF_8)
+        } catch (e: BadPaddingException) {
+            Log.e("EncryptionHelper", "Decryption failed: BadPaddingException - ${e.message}", e)
+            return null
+        } catch (e: IllegalBlockSizeException) {
+            Log.e("EncryptionHelper", "Decryption failed: IllegalBlockSizeException - ${e.message}", e)
+            return null
+        } catch (e: InvalidKeyException) {
+            Log.e("EncryptionHelper", "Decryption failed: InvalidKeyException - ${e.message}", e)
+            return null
+        } catch (e: IllegalArgumentException) {
+            Log.e("EncryptionHelper", "Decryption failed: Invalid Base64 format - ${e.message}", e)
+            return null
+        } catch (e: Exception) {
+            Log.e("EncryptionHelper", "Decryption failed: ${e.javaClass.simpleName} - ${e.message}", e)
+            return null
+        }
     }
 }

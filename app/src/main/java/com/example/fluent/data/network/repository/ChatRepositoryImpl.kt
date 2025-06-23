@@ -23,6 +23,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.delay
 
 class ChatRepositoryImpl(
     private val httpClient: HttpClient,
@@ -77,8 +78,13 @@ class ChatRepositoryImpl(
                     return Result.failure(Exception("Missing private key"))
                 }
                 val messageList = response.mapNotNull { msg ->
+                    delay(250)
                     try {
                         val decrypted = encryptionHelper.decrypt(msg.content, privateKey)
+                        if (decrypted == null) {
+                            Log.d("GetAllMessage", "Decryption failed for message senderId ${msg.senderID}->receiverID ${msg.receiverID} content ${msg.content}, skipping")
+                            return@mapNotNull null
+                        }
                         msg.copy(content = decrypted).toDomainMessage(receiverIDWebSocket = receiverId)
                     } catch (e: Exception) {
                         Log.d("GetAllMessage", "Decryption failed for message senderId ${msg.senderID}->receiverID ${msg.receiverID} content ${msg.content}, skipping")

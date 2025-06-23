@@ -25,7 +25,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import javax.crypto.IllegalBlockSizeException
 
 class WebSocketServiceImpl(
     private val httpClient: HttpClient,
@@ -34,11 +40,14 @@ class WebSocketServiceImpl(
     private var session: WebSocketSession? = null
     private val _incomingMessages = MutableSharedFlow<Message>()
 
+    private val wsScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val decryptMutex = Mutex()
+
 
     private var _receiverId: Int? = null
 
     override fun connect(url: String, token: String, receiverId: Int) {
-        CoroutineScope(Dispatchers.IO).launch {
+        wsScope.launch {
             try {
                 Log.d("TOKEN_PHYSICAL", token)
                 if (token.isBlank()) {
@@ -59,7 +68,7 @@ class WebSocketServiceImpl(
     }
 
     private fun listenForIncomingMessages() {
-        CoroutineScope(Dispatchers.IO).launch {
+        wsScope.launch {
             try {
                 session?.incoming?.consumeEach { frame ->
                     if (frame is Frame.Text) {
@@ -73,17 +82,26 @@ class WebSocketServiceImpl(
                             )
                             Log.d("Private key", "🔑 Private key: ${KeyManager.getPrivateKey()}")
                             Log.d("msg", msg.toString())
-                            val decrypted = try {
-                                encryptionHelper.decrypt(
-                                    msg.content,
-                                    KeyManager.getPrivateKey()
-                                        ?: throw Exception("Private key not found")
-                                )
-                            } catch (e: Exception) {
-                                Log.d(
-                                    "WebSocketServiceImpl",
-                                    "Error decrypting message: ${e.message}"
-                                )
+                            val decrypted = decryptMutex.withLock {
+                                delay(25)
+                                val privateKey = KeyManager.getPrivateKey()
+                                    ?: throw Exception("Private key not found")
+                                try {
+                                    encryptionHelper.decrypt(msg.content, privateKey)
+                                } catch (e: IllegalBlockSizeException) {
+                                    delay(100)
+                                    encryptionHelper.decrypt(msg.content, privateKey)
+                                } catch (e: Exception) {
+                                    Log.d(
+                                        "WebSocketServiceImpl",
+                                        "Error decrypting message: ${e.message}"
+                                    )
+                                    null
+                                }
+                            }
+                            Log.d("Incoming decrypted", "📨 Incoming decrypted: $decrypted")
+                            if (decrypted == null) {
+                                Log.d("WebSocketServiceImpl", "Decryption failed")
                                 return@launch
                             }
                             msg = msg.copy(content = decrypted)
@@ -105,14 +123,14 @@ class WebSocketServiceImpl(
     }
 
     override fun disconnect() {
-        CoroutineScope(Dispatchers.IO).launch {
+        wsScope.launch {
             session?.close()
             session = null
         }
     }
 
     override fun send(message: MessageCreate) {
-        CoroutineScope(Dispatchers.IO).launch {
+        wsScope.launch {
             try {
                 val messageDto = message.toDataMessage(
                     _receiverId ?: throw IllegalStateException("Receiver ID not set")
