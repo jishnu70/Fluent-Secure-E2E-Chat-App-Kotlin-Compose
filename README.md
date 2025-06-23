@@ -1,28 +1,47 @@
+
 # 🗨️ Fluent - Secure Chat App with End-to-End Encryption
 
-**Fluent** is a secure, real-time Android chat application built with Jetpack Compose and powered by a Kotlin-based architecture. It features **end-to-end encrypted messaging**, **token-based authentication**, and **WebSocket-based real-time communication** — all backed by a FastAPI server.
+**Fluent** is a secure, real-time Android chat application built with Jetpack Compose and Kotlin. It features **end-to-end encrypted messaging**, **token-based authentication**, and **real-time communication** using **Ktor WebSockets** — all backed by a **FastAPI** server.
 
 ---
 
 ## ✨ Features
 
-- 🔐 **End-to-End Encrypted Messaging** (RSA)
+- 🔐 **End-to-End Encrypted Messaging (RSA via Android Keystore)**
 - 🌐 **Real-Time Messaging** using Ktor WebSockets
-- 🔑 **Secure JWT Authentication** with Refresh Tokens
-- 📱 **Jetpack Compose UI** with smooth UX and animations
-- 💬 **Chat List & Messaging Interface**
-- 🔍 **User Search** (in progress, backend ready)
-- 👤 **Profile Sidebar Drawer** (UI implemented, dynamic data coming)
-- 🎨 **Custom Bottom Navigation Bar**
-- ☁️ **Token Storage using EncryptedSharedPreferences**
-- 🧠 **MVVM Architecture + Clean Layer Separation**
-- 🛠️ **Dependency Injection using Koin**
+- 🔑 **JWT Authentication** with Refresh Token Support
+- 📱 **Jetpack Compose UI** (Material 3) with smooth UX
+- 💬 **Message List & One-on-One Chat**
+- 🧩 **Receiver-Side RSA Decryption via AndroidKeyStore**
+- 🚀 **Message Streaming via WebSocket Flow Collector**
+- 🎯 **Auto Key Generation + Storage via Android Keystore**
+- ☁️ **EncryptedSharedPreferences for Secure Token Storage**
+- 👤 **User Profiles & Sidebar Drawer**
+- 🧭 **Custom Bottom Navigation with Slide Menu**
+- 🧠 **MVVM + Clean Architecture**
+- 🔧 **Dependency Injection via Koin**
+- 📦 **Structured Modular Codebase**
 
 ---
 
 ## 📸 Screenshots
 
-> _(Add screenshots or GIFs of chat, login, profile drawer, message list here when final polish is done)_
+### 🔐 SignIn Screen
+![SignIn Screenshot](assets/login.png)
+
+### 🔐 SignUp Screen
+![SignUp Screenshot](assets/register.png)
+
+### 🔐 ChatList Screen
+![ChatList Screenshot](assets/chatList.png)
+
+### 🔐 Message Screen
+![Message Screenshot](assets/message.png)
+
+### 🔐 UserSearch Screen
+![UserSearch Screenshot](assets/userSearch.png)
+
+> _To be added: Chat UI, Login Flow, Message Decryption, Drawer Menu_
 
 ---
 
@@ -30,77 +49,101 @@
 
 ```
 presentation/
-    - authentication/
-    - chatList/
-    - message/
-    - splashOpening/
-    - profile/
+    ├── authentication/
+    ├── chatList/
+    ├── message/
+    ├── splashOpening/
+    ├── profile/
 data/
-    - dto/
-    - remote/
-    - mapper/
-    - repository/
-    - network/
+    ├── dto/
+    ├── remote/
+    ├── mapper/
+    ├── network/
 domain/
-    - models/
-    - repository/
-    - utility/
+    ├── models/
+    ├── repository/
+    ├── utility/
 di/
-    - Koin Modules (Network, ViewModel, Repository)
+    ├── Koin modules (network, encryption, viewmodel, repository)
 ```
 
-- **Jetpack Compose** for UI
-- **Ktor HTTP & WebSocket Client**
-- **RSA Encryption** using Android Keystore
-- **Flow & State Management** via StateFlow
+- Jetpack Compose for UI
+- Ktor HTTP/WebSocket for networking
+- Android Keystore for RSA encryption
+- StateFlow & SharedFlow for reactive state management
 
 ---
 
 ## 🔐 End-to-End Encryption Details
 
-Each user device generates an RSA keypair using Android's Keystore API. Messages are encrypted with the recipient's public key and decrypted with the private key on-device. Messages are never stored or transmitted in plain text.
+Each device generates an RSA keypair securely stored via the **Android Keystore System**.
+- Messages are encrypted with the **recipient's public key**.
+- Messages are decrypted using the **user’s private key** on-device.
+- No plaintext is stored or transmitted at any point.
+- Message decryption runs on a **dedicated coroutine scope** with `SupervisorJob` and `Mutex` for serialized, thread-safe access.
 
 ---
 
-## 🔧 Tech Stack
+## 🧪 Real-Time Communication
 
-- **Kotlin** + **Jetpack Compose**
-- **Ktor Client (HTTP/WebSocket)**
-- **Koin** (Dependency Injection)
-- **EncryptedSharedPreferences**
-- **Android Keystore** (RSA Keypair generation)
-- **FastAPI** (Backend)
-- **JWT** (Access + Refresh Tokens)
+- Messages are received over WebSocket (`Ktor client`)
+- Decryption occurs on a background coroutine (`Dispatchers.Default`) using a `Mutex`
+- Flow collector emits to the UI using `SharedFlow` to support real-time updates
 
 ---
 
-## 🚧 Future Work (Already In Progress)
+## ⚙️ Tech Stack
 
-- [x] **Profile Screen Dynamic Content** (Logout, username, public key info)
-- [x] **User Search Screen UI**
-- [x] **User Search API Integration**
-- [ ] **Push Notification Support (Firebase)**
-- [ ] **Typing Indicator via WebSocket**
-- [ ] **Media Sharing (Images, Voice, Files)**
-- [ ] **Offline Mode with Room DB**
+- 🧬 **Kotlin** + **Jetpack Compose**
+- 🌐 **Ktor HTTP/WebSocket Client**
+- 🧩 **Koin** (DI)
+- 🛡️ **EncryptedSharedPreferences**
+- 🔐 **Android Keystore (RSA)**
+- 🧠 **StateFlow + SharedFlow**
+- 🖥️ **FastAPI (Python Backend)**
+- 📜 **JWT Authentication (Access + Refresh Tokens)**
 
 ---
 
-## 🧪 How to Run
+## 🧱 Improvements Made
+
+- ✅ RSA decryption now safely runs in a background coroutine with a `Mutex` to avoid `IllegalBlockSizeException`
+- ✅ Decryption bug fixed: messages now decrypt properly when received live (even without screen navigation)
+- ✅ `SupervisorJob` added to isolate failure of decrypt jobs
+- ✅ Scoped coroutine (`wsScope`) handles WebSocket lifecycle reliably
+- ✅ WebSocket reconnect and lifecycle cleanup improved
+
+---
+
+## 🚧 Future Work
+
+- [x] User Search API integration
+- [x] Real-Time Message Sync using Flow
+- [ ] Push Notifications (FCM integration)
+- [ ] Typing Indicators
+- [ ] Media Sharing (images, files, voice notes)
+- [ ] Offline-first with Room DB
+- [ ] Read receipts, chat status
+
+---
+
+## ▶️ How to Run
 
 1. Clone this repo:
    ```bash
    git clone https://github.com/jishnu70/Fluent-Secure-E2E-Chat-App-Kotlin-Compose.git
    ```
 
-2. Open in **Android Studio** (Kotlin 1.9+, Compose Compiler required)
+2. Open in **Android Studio** (Kotlin 1.9+, Compose Compiler 1.5+)
 
-3. Run the FastAPI backend (see server repo or backend setup instructions)
+3. Run the FastAPI backend
+   > (Backend repo: [cryptalkfastapi](https://github.com/jishnu70/cryptalkfastapi))
 
-4. Launch the app on emulator or physical device (Android 8.0+)
+4. Launch on a device or emulator (Android 8.0+ required)
 
 ---
 
 ## 🤝 Contributing
 
-This project is currently solo-built. Feel free to suggest features or improvements via issues or pull requests!
+This project is built solo for now.  
+Feel free to open issues, suggest improvements, or send PRs if you're passionate about privacy-first messaging apps.

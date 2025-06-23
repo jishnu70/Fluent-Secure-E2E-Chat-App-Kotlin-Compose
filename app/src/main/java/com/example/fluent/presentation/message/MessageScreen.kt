@@ -60,6 +60,7 @@ fun MessageScreenRoot(
         topBar = {
             MessageTopBar(
                 modifier = Modifier.padding(vertical = 10.dp),
+                partnerName = state.partnerInfo?.user_name ?: "User",
                 onBackClick = onBackClick
             )
         }

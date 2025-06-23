@@ -58,6 +58,7 @@ fun formatTimestamp(timestamp: String): String {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChatListItem(
     chat: ChatList,
@@ -127,7 +128,7 @@ fun ChatListItem(
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = formatTimestamp(chat.message.timestamp),
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = Brown,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,

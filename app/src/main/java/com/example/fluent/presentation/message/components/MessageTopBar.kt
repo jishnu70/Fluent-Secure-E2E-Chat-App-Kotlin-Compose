@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.fluent.R
@@ -35,6 +36,7 @@ import com.example.fluent.ui.theme.PeachWhite
 @Composable
 fun MessageTopBar(
     modifier: Modifier = Modifier,
+    partnerName: String,
     onBackClick: () -> Unit,
 ) {
     Surface(
@@ -109,10 +111,12 @@ fun MessageTopBar(
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "User_1",
-                    style = MaterialTheme.typography.headlineLarge,
+                    text = partnerName,
+                    style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.W900,
                     color = Brown,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             Spacer(modifier = Modifier.width(20.dp))
