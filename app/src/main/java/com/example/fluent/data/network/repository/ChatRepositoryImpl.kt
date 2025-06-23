@@ -81,7 +81,7 @@ class ChatRepositoryImpl(
                         val decrypted = encryptionHelper.decrypt(msg.content, privateKey)
                         msg.copy(content = decrypted).toDomainMessage(receiverIDWebSocket = receiverId)
                     } catch (e: Exception) {
-                        Log.d("GetAllMessage", "Decryption failed for message id ${msg.senderID}->${msg.receiverID}, skipping")
+                        Log.d("GetAllMessage", "Decryption failed for message senderId ${msg.senderID}->receiverID ${msg.receiverID} content ${msg.content}, skipping")
                         null  // skip bad messages
                     }
                 }
@@ -157,21 +157,21 @@ class ChatRepositoryImpl(
 
     override fun sendMessage(message: MessageCreate, partnerInfo: PartnerInfo): Result<Boolean> {
         try {
-            if (message.content.isNotBlank()) {
-                val public_key_string = partnerInfo.public_key
-                val public_key_encoding = try {
-                    public_key_string.toRSAPublicKey()
-                } catch (e: Exception) {
-                    Log.d("ChatRepositoryImpl", "Error decoding public key: ${e.message}")
-                    return Result.failure(e)
-                }
-                val encryptedMessage = encryptionHelper.encrypt(
-                    message.content,
-                    public_key_encoding
-                )
+            if (message.senderEncrypted.isNotBlank()) {
+//                val public_key_string = partnerInfo.public_key
+//                val public_key_encoding = try {
+//                    public_key_string.toRSAPublicKey()
+//                } catch (e: Exception) {
+//                    Log.d("ChatRepositoryImpl", "Error decoding public key: ${e.message}")
+//                    return Result.failure(e)
+//                }
+//                val encryptedMessage = encryptionHelper.encrypt(
+//                    message.content,
+//                    public_key_encoding
+//                )
 
-                val newMessage = message.copy(content = encryptedMessage)
-                webSocketService.send(message = newMessage)
+//                val newMessage = message.copy(content = encryptedMessage)
+                webSocketService.send(message = message)
                 return Result.success(true)
             } else {
                 return Result.failure(Exception("Message is empty"))

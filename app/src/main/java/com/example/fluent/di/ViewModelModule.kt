@@ -23,7 +23,7 @@ val ViewModelModule = module {
             tokenManager = get()
         )
     }
-    viewModel { MessageViewModel(get(), get()) }
+    viewModel { MessageViewModel(get(), get(), get()) }
 
     viewModel { ProfileViewModel(get()) }
 

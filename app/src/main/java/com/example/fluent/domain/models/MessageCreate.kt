@@ -1,7 +1,7 @@
 package com.example.fluent.domain.models
 
 data class MessageCreate(
-    val content: String,
+    val senderEncrypted: String,
+    val receiverEncrypted: String,
     val messageType: String,
-//    val attachmentID: Int? = null
 )

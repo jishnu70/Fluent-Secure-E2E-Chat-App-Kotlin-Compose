@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -31,7 +32,7 @@ class WebSocketServiceImpl(
     private val encryptionHelper: EncryptionHelper
 ) : WebSocketService {
     private var session: WebSocketSession? = null
-    private val _incomingMessages = MutableSharedFlow<MessageResponseDto>()
+    private val _incomingMessages = MutableSharedFlow<Message>()
 
 
     private var _receiverId: Int? = null
@@ -65,10 +66,33 @@ class WebSocketServiceImpl(
                         val rawJson = frame.readText()
                         try {
                             var msg = Json.decodeFromString<MessageResponseDto>(rawJson)
-                            val decrypted =
-                                encryptionHelper.decrypt(msg.content, KeyManager.getPrivateKey()!!)
+                            Log.d("Incoming encrypted", "📨 Incoming encrypted: ${msg.content}")
+                            Log.d(
+                                "Private key available",
+                                "🔑 Private key available: ${KeyManager.getPrivateKey() != null}"
+                            )
+                            Log.d("Private key", "🔑 Private key: ${KeyManager.getPrivateKey()}")
+                            Log.d("msg", msg.toString())
+                            val decrypted = try {
+                                encryptionHelper.decrypt(
+                                    msg.content,
+                                    KeyManager.getPrivateKey()
+                                        ?: throw Exception("Private key not found")
+                                )
+                            } catch (e: Exception) {
+                                Log.d(
+                                    "WebSocketServiceImpl",
+                                    "Error decrypting message: ${e.message}"
+                                )
+                                return@launch
+                            }
                             msg = msg.copy(content = decrypted)
-                            _incomingMessages.emit(msg)
+                            _incomingMessages.emit(
+                                msg.toDomainMessage(
+                                    _receiverId
+                                        ?: throw IllegalStateException("Receiver ID not set")
+                                )
+                            )
                         } catch (e: Exception) {
                             println("Failed to parse message: $rawJson → ${e.message}")
                         }
@@ -101,10 +125,5 @@ class WebSocketServiceImpl(
         }
     }
 
-    override val incomingMessages: Flow<Message>
-        get() = _incomingMessages.map {
-            it.toDomainMessage(
-                _receiverId ?: throw IllegalStateException("Receiver ID not set")
-            )
-        }
+    override val incomingMessages = _incomingMessages.asSharedFlow()
 }

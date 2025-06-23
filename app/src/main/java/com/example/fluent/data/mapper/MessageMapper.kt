@@ -21,8 +21,9 @@ fun MessageResponseDto.toDomainMessage(receiverIDWebSocket: Int): Message {
 fun MessageCreate.toDataMessage(receiverIDWebSocket: Int): MessageCreateDto {
     return MessageCreateDto(
         receiverID = receiverIDWebSocket,
-        content = content,
-        messageType = messageType,
+        sender_encrypted = senderEncrypted,
+        receiver_encrypted = receiverEncrypted,
+        messageType = messageType
     )
 }
 

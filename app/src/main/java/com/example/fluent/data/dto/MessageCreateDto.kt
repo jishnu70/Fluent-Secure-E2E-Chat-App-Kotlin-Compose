@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MessageCreateDto(
     val receiverID: Int,
-    val content: String,
+    val receiver_encrypted: String,
+    val sender_encrypted: String,
     val messageType: String,
-//    val attachmentID: Int? = null
 )
