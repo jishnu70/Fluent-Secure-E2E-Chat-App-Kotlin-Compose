@@ -26,20 +26,23 @@
 
 ## 📸 Screenshots
 
-### 🔐 SignIn Screen
-![SignIn Screenshot](assets/login.png)
+### 🔐 Login & Register
+<p float="left">
+  <img src="assets/login.png" width="300"  alt=""/>
+  <img src="assets/register.png" width="200"  alt=""/>
+</p>
 
-### 🔐 SignUp Screen
-![SignUp Screenshot](assets/register.png)
+### 💬 Chat List & Messages
+<p float="left">
+  <img src="assets/chatList.png" width="200"  alt=""/>
+  <img src="assets/message.png" width="200"  alt=""/>
+</p>
 
-### 🔐 ChatList Screen
-![ChatList Screenshot](assets/chatList.png)
+### 🔍 User Search
+<p float="left">
+  <img src="assets/userSearch.png" width="200"  alt=""/>
+</p>
 
-### 🔐 Message Screen
-![Message Screenshot](assets/message.png)
-
-### 🔐 UserSearch Screen
-![UserSearch Screenshot](assets/userSearch.png)
 
 > _To be added: Chat UI, Login Flow, Message Decryption, Drawer Menu_
 
