@@ -7,7 +7,6 @@ import com.example.fluent.data.dto.PartnerInfoResponseDto
 import com.example.fluent.data.mapper.toDomainChatList
 import com.example.fluent.data.mapper.toDomainMessage
 import com.example.fluent.data.mapper.toDomainPartnerInfo
-import com.example.fluent.data.mapper.toRSAPublicKey
 import com.example.fluent.data.network.MessageRoutes
 import com.example.fluent.data.network.WebSocketRoutes
 import com.example.fluent.data.remote.EncryptionHelper
@@ -24,6 +23,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
+import java.security.PrivateKey
 
 class ChatRepositoryImpl(
     private val httpClient: HttpClient,
@@ -42,8 +42,30 @@ class ChatRepositoryImpl(
                     return Result.failure(Exception("Invalid server response", e))
                 }
                 Log.d("ChatList request received: ", "Response: $response")
+                val privateKey = getPrivateKey()
+                if (privateKey == null) {
+                    return Result.failure(Exception("Missing private key"))
+                }
+                val decryptedResponse = try {
+                    response.map {
+                        val decryptedMessage = decryptTheMessage(it.message.content, privateKey)
+                        if (decryptedMessage == null) {
+                            Log.d(
+                                "ChatList",
+                                "Decryption failed for message senderId ${it.message.senderID}->receiverID ${it.message.receiverID} content ${it.message.content}, skipping"
+                            )
+                        }
+                        it.copy(
+                            message = it.message.copy(
+                                content = decryptedMessage ?: it.message.content
+                            )
+                        )
+                    }
+                } catch (e: Exception) {
+                    return Result.failure(Exception("Failed to Decrypt response", e))
+                }
                 val chatList = try {
-                    response.map { it.toDomainChatList() }
+                    decryptedResponse.map { it.toDomainChatList() }
                 } catch (e: Exception) {
                     return Result.failure(Exception("Invalid server response", e))
                 }
@@ -72,7 +94,7 @@ class ChatRepositoryImpl(
                     return Result.failure(Exception("Invalid server response", e))
                 }
                 Log.d("GetAllMessage request received: ", "Response: $response")
-                val privateKey = KeyManager.getPrivateKey()
+                val privateKey = getPrivateKey()
                 if (privateKey == null) {
                     Log.d("GetAllMessage", "Private key not found.")
                     return Result.failure(Exception("Missing private key"))
@@ -80,14 +102,21 @@ class ChatRepositoryImpl(
                 val messageList = response.mapNotNull { msg ->
                     delay(250)
                     try {
-                        val decrypted = encryptionHelper.decrypt(msg.content, privateKey)
+                        val decrypted = decryptTheMessage(msg.content, privateKey)
                         if (decrypted == null) {
-                            Log.d("GetAllMessage", "Decryption failed for message senderId ${msg.senderID}->receiverID ${msg.receiverID} content ${msg.content}, skipping")
+                            Log.d(
+                                "GetAllMessage",
+                                "Decryption failed for message senderId ${msg.senderID}->receiverID ${msg.receiverID} content ${msg.content}, skipping"
+                            )
                             return@mapNotNull null
                         }
-                        msg.copy(content = decrypted).toDomainMessage(receiverIDWebSocket = receiverId)
+                        msg.copy(content = decrypted)
+                            .toDomainMessage(receiverIDWebSocket = receiverId)
                     } catch (e: Exception) {
-                        Log.d("GetAllMessage", "Decryption failed for message senderId ${msg.senderID}->receiverID ${msg.receiverID} content ${msg.content}, skipping")
+                        Log.d(
+                            "GetAllMessage",
+                            "Decryption failed ( error: ${e.localizedMessage} for message senderId ${msg.senderID}->receiverID ${msg.receiverID} content ${msg.content}, skipping"
+                        )
                         null  // skip bad messages
                     }
                 }
@@ -196,5 +225,13 @@ class ChatRepositoryImpl(
             Log.d("ChatRepositoryImpl", "Error disconnecting: ${e.message}")
             return Result.failure(e)
         }
+    }
+
+    private fun getPrivateKey(): PrivateKey? {
+        return KeyManager.getPrivateKey()
+    }
+
+    private fun decryptTheMessage(msg: String, privateKey: PrivateKey): String? {
+        return encryptionHelper.decrypt(msg, privateKey)
     }
 }
